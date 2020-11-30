@@ -53,8 +53,13 @@ public class AppController {
         Optional<Person> result = repository.findById(id);
         //TODO: check if the result is found,
         //TODO: put data in the model field to be displayed in the page
-        return "show";
+        if(result.isPresent()){
+            model.addAttribute("person", result.get());
+            return "show";
+        }
+
         //TODO: in case no data is found, display the "notfound" page
+        return "notfound";
     }
 
 
@@ -66,7 +71,13 @@ public class AppController {
         Optional<Person> result = repository.findById(id);
         //TODO: check if the result is found
         //TODO: put data in the model field to be displayed in the next page to edit them
-        return "edit";
+        if(result.isPresent()){
+            model.addAttribute("id", result.get().getId());
+            model.addAttribute("firstName", result.get().getFirstName());
+            model.addAttribute("lastName", result.get().getLastName());
+            return "edit";
+        }
+        return "notfound";
         //TODO: in case no data is found, display the "notfound" page
     }
 
@@ -78,6 +89,17 @@ public class AppController {
             Model model) {
         //TODO: check if the result is found
         //TODO: delete the old person and add a new person
+        Optional<Person> result = repository.findById(id);
+        if(result.isPresent()){
+
+            model.addAttribute("id", id);
+            model.addAttribute("firstName", firstname);
+            model.addAttribute("lastName", lastname);
+            result.get().setFirstName(firstname);
+            result.get().setLastName(lastname);
+            repository.save(result.get());
+        }
+
         return "redirect:/list";
         //TODO: in case no data is found, display the "notfound" page
     }
@@ -88,6 +110,11 @@ public class AppController {
             @RequestParam(name="id", required=true) Long id) {
         //TODO: check if the result is found
         //TODO: delete the old person and add a new person
+        Optional<Person> result = repository.findById(id);
+        if(result.isPresent()){
+            repository.delete(result.get());
+        }
+
         return "redirect:/list";
         //TODO: in case no data is found, display the "notfound" page
     }
